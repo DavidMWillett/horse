@@ -11,6 +11,7 @@ class HorseConstraintProvider : ConstraintProvider {
         return arrayOf(
             simultaneousTasks(constraintFactory),
             employeeNotAvailable(constraintFactory),
+            excludePrincipals(constraintFactory),
         )
     }
 
@@ -30,4 +31,11 @@ class HorseConstraintProvider : ConstraintProvider {
             .filter { task -> !task.employee!!.availability.entries[task.shift!!.ordinal][task.duty!!.ordinal] }
             .penalize("Employee not available for shift/duty", HardMediumSoftScore.ONE_HARD)
     }
+
+    private fun excludePrincipals(constraintFactory: ConstraintFactory): Constraint {
+        return constraintFactory.from(Task::class.java)
+            .filter { task -> task.employee!!.team == Team.PRINCIPALS }
+            .penalize("Use of principals", HardMediumSoftScore.ONE_SOFT) { 100 }
+    }
+
 }
