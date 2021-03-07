@@ -1,8 +1,31 @@
 package com.dajati.horse
 
-class Roster(val employeeList: List<Employee>, val taskList: List<Task>)
+import org.optaplanner.core.api.domain.entity.PlanningEntity
+import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
+import org.optaplanner.core.api.domain.solution.PlanningScore
+import org.optaplanner.core.api.domain.solution.PlanningSolution
+import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider
+import org.optaplanner.core.api.domain.variable.PlanningVariable
+import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore
 
-class Task(val duty: Duty, val shift: Shift, val employee: Employee?)
+@PlanningSolution
+class Roster(
+    @ValueRangeProvider(id = "employeeRange")
+    val employeeList: List<Employee>? = null,
+    @PlanningEntityCollectionProperty
+    val taskList: List<Task>? = null
+) {
+    @PlanningScore
+    lateinit var score: HardMediumSoftScore
+}
+
+@PlanningEntity
+class Task(
+    val duty: Duty? = null,
+    val shift: Shift? = null,
+    @PlanningVariable(valueRangeProviderRefs = ["employeeRange"])
+    val employee: Employee? = null
+)
 
 class Employee(val name: String, val team: Team, val availability: Availability)
 
