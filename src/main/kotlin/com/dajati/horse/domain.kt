@@ -10,10 +10,10 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore
 
 @PlanningSolution
 class Roster(
+    @PlanningEntityCollectionProperty
+    val taskList: List<Task>? = null,
     @ValueRangeProvider(id = "employeeRange")
     val employeeList: List<Employee>? = null,
-    @PlanningEntityCollectionProperty
-    val taskList: List<Task>? = null
 ) {
     @PlanningScore
     lateinit var score: HardMediumSoftScore
@@ -25,7 +25,13 @@ class Task(
     val shift: Shift? = null,
     @PlanningVariable(valueRangeProviderRefs = ["employeeRange"])
     val employee: Employee? = null
-)
+) {
+    val id = nextId++
+
+    companion object {
+        var nextId = 1
+    }
+}
 
 class Employee(val name: String, val team: Team, val availability: Availability)
 
