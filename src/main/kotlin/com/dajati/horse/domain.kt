@@ -33,7 +33,9 @@ class Task(
     }
 }
 
-class Employee(val name: String, val team: Team, val availability: Availability)
+data class Employee(val name: String, val team: Team, val availability: Availability)
+
+data class Availability(val entries: List<List<Boolean>>)
 
 enum class Team {
     PRINCIPALS,
@@ -41,8 +43,6 @@ enum class Team {
     MPN_CML,
     LYMPHOID,
 }
-
-class Availability(val entries: List<List<Boolean>>)
 
 enum class Duty {
     FISH,
