@@ -8,6 +8,7 @@ class HorseConstraintProvider : ConstraintProvider {
         return arrayOf(
             simultaneousTasks(constraintFactory),
             employeeNotAvailable(constraintFactory),
+            maxOneTaskPerDay(constraintFactory),
             maxThreeTasksPerWeek(constraintFactory),
             excludePrincipals(constraintFactory),
         )
@@ -28,6 +29,17 @@ class HorseConstraintProvider : ConstraintProvider {
         return constraintFactory.from(Task::class.java)
             .filter { task -> !task.employee!!.availability[task.shift!!, task.duty!!] }
             .penalize("Employee not available for shift/duty", HardMediumSoftScore.ONE_HARD)
+    }
+
+    private fun maxOneTaskPerDay(constraintFactory: ConstraintFactory): Constraint {
+        return constraintFactory.from(Task::class.java)
+            .join(
+                Task::class.java,
+                Joiners.lessThan(Task::id),
+                Joiners.equal(Task::employee),
+                Joiners.filtering { t1, t2 -> t1.duty != Duty.FISH || t2.duty != Duty.FISH })
+            .filter { t1, t2 -> t1.dayOfWeek == t2.dayOfWeek }
+            .penalize("Two tasks on same day (unless both FISH)", HardMediumSoftScore.ONE_MEDIUM)
     }
 
     private fun maxThreeTasksPerWeek(constraintFactory: ConstraintFactory): Constraint {

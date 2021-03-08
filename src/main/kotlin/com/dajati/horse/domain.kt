@@ -31,6 +31,9 @@ class Task(
     @PlanningPin
     val pinned = employee != null
 
+    val dayOfWeek: Int
+        get() = shift!!.ordinal / 2
+
     companion object {
         var nextId = 1
     }
