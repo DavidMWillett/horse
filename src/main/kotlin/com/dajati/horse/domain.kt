@@ -38,7 +38,11 @@ class Task(
 
 data class Employee(val name: String, val team: Team, val availability: Availability)
 
-data class Availability(val entries: List<List<Boolean>>)
+data class Availability(val entries: List<List<Boolean>>) {
+    operator fun get(shift: Shift, duty: Duty): Boolean {
+        return entries[shift.ordinal][duty.ordinal]
+    }
+}
 
 enum class Team {
     PRINCIPALS,

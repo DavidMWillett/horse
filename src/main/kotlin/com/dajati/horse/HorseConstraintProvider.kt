@@ -26,7 +26,7 @@ class HorseConstraintProvider : ConstraintProvider {
 
     private fun employeeNotAvailable(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
-            .filter { task -> !task.employee!!.availability.entries[task.shift!!.ordinal][task.duty!!.ordinal] }
+            .filter { task -> !task.employee!!.availability[task.shift!!, task.duty!!] }
             .penalize("Employee not available for shift/duty", HardMediumSoftScore.ONE_HARD)
     }
 
