@@ -12,6 +12,7 @@ class HorseConstraintProvider : ConstraintProvider {
             fullDayFISH(constraintFactory),
             maxThreeTasksPerWeek(constraintFactory),
             excludePrincipals(constraintFactory),
+            shareTasksFairly(constraintFactory),
         )
     }
 
@@ -65,5 +66,13 @@ class HorseConstraintProvider : ConstraintProvider {
         return constraintFactory.from(Task::class.java)
             .filter { task -> task.employee!!.team == Team.PRINCIPALS }
             .penalize("Use of principals", HardMediumSoftScore.ONE_SOFT) { 100 }
+    }
+
+    private fun shareTasksFairly(constraintFactory: ConstraintFactory): Constraint {
+        return constraintFactory.from(Task::class.java)
+            .groupBy(Task::employee, ConstraintCollectors.count())
+            .penalize("Tasks shared unfairly between employees",
+                HardMediumSoftScore.ONE_SOFT
+            ) { _, taskCount -> taskCount * taskCount }
     }
 }
