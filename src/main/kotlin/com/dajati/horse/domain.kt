@@ -1,6 +1,7 @@
 package com.dajati.horse
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity
+import org.optaplanner.core.api.domain.entity.PlanningPin
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore
 import org.optaplanner.core.api.domain.solution.PlanningSolution
@@ -24,9 +25,11 @@ class Task(
     val duty: Duty? = null,
     val shift: Shift? = null,
     @PlanningVariable(valueRangeProviderRefs = ["employeeRange"])
-    val employee: Employee? = null
+    val employee: Employee? = null,
 ) {
     val id = nextId++
+    @PlanningPin
+    val pinned = employee != null
 
     companion object {
         var nextId = 1
