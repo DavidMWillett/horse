@@ -39,7 +39,13 @@ class Task(
     }
 }
 
-data class Employee(val name: String, val team: Team, val availability: Availability)
+data class Employee(
+    val name: String,
+    val team: Team,
+    val availability: Availability,
+    val priorShifts: Int,
+    val priorTasks: Int,
+)
 
 data class Availability(val entries: List<List<Boolean>>) {
     operator fun get(shift: Shift, duty: Duty): Boolean {

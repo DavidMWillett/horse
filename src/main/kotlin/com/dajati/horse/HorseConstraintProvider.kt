@@ -73,6 +73,9 @@ class HorseConstraintProvider : ConstraintProvider {
             .groupBy(Task::employee, ConstraintCollectors.count())
             .penalize("Tasks shared unfairly between employees",
                 HardMediumSoftScore.ONE_SOFT
-            ) { _, taskCount -> taskCount * taskCount }
+            ) { employee, taskCount ->
+                val penalty = 100 * (taskCount + (employee?.priorTasks ?: 0)) / (employee?.priorShifts ?: 0)
+                penalty * penalty
+            }
     }
 }
