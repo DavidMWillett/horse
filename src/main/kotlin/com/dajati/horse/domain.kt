@@ -47,6 +47,8 @@ data class Employee(
     val priorShifts: Int,
     val priorTasks: Int,
 ) {
+    val workingShiftCount = statuses.count { it == Status.AT_WORK || it == Status.WORKING_FROM_HOME }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
