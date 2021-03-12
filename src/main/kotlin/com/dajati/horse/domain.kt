@@ -42,10 +42,29 @@ class Task(
 data class Employee(
     val name: String,
     val team: Team,
+    val statuses: Array<Status>,
     val availability: Availability,
     val priorShifts: Int,
     val priorTasks: Int,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as Employee
+        if (name != other.name) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+
+    fun canPerform(task: Task): Boolean {
+        val shift = task.shift!!
+        val duty = task.duty!!
+        return statuses[shift.ordinal] == Status.AT_WORK && availability[shift, duty]
+    }
+}
 
 data class Availability(val entries: List<List<Boolean>>) {
     operator fun get(shift: Shift, duty: Duty): Boolean {
@@ -78,4 +97,11 @@ enum class Shift {
     THURSDAY_PM,
     FRIDAY_AM,
     FRIDAY_PM,
+}
+
+enum class Status {
+    AT_WORK,
+    WORKING_FROM_HOME,
+    ANNUAL_LEAVE,
+    DOES_NOT_WORK,
 }
