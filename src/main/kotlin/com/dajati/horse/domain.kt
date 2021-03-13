@@ -47,7 +47,9 @@ data class Employee(
     val priorShifts: Int,
     val priorTasks: Int,
 ) {
-    val workingShiftCount = statuses.count { it == Status.AT_WORK || it == Status.WORKING_FROM_HOME }
+    val workingShiftCount = statuses.count {
+        it == Status.AVAILABLE || it == Status.UNAVAILABLE  || it == Status.WORKING_FROM_HOME
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -64,7 +66,7 @@ data class Employee(
     fun canPerform(task: Task): Boolean {
         val shift = task.shift!!
         val duty = task.duty!!
-        return statuses[shift.ordinal] == Status.AT_WORK && availability[shift, duty]
+        return statuses[shift.ordinal] == Status.AVAILABLE && availability[shift, duty]
     }
 }
 
@@ -102,7 +104,8 @@ enum class Shift {
 }
 
 enum class Status {
-    AT_WORK,
+    AVAILABLE,
+    UNAVAILABLE,
     WORKING_FROM_HOME,
     ANNUAL_LEAVE,
     DOES_NOT_WORK,
