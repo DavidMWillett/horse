@@ -11,6 +11,7 @@ class HorseConstraintProvider : ConstraintProvider {
             maxOneTaskPerDay(constraintFactory),
             fullDayFISH(constraintFactory),
             maxThreeTasksPerWeek(constraintFactory),
+            maxOneDSTaskPerWeek(constraintFactory),
             excludePrincipals(constraintFactory),
             shareTasksFairly(constraintFactory),
         )
@@ -62,6 +63,19 @@ class HorseConstraintProvider : ConstraintProvider {
             .penalize("Employee with more than three tasks", HardMediumSoftScore.ONE_MEDIUM)
     }
 
+    private fun maxOneDSTaskPerWeek(constraintFactory: ConstraintFactory): Constraint {
+        return constraintFactory.from(Task::class.java)
+            .join(Task::class.java,
+                Joiners.lessThan(Task::id),
+                Joiners.equal(Task::employee),
+                Joiners.filtering { t1, t2 ->
+                    (t1.duty == Duty.DS || t1.duty == Duty.LATE_DS) &&
+                        (t2.duty == Duty.DS || t2.duty == Duty.LATE_DS)
+                }
+            )
+            .penalize("Employee with more than one (Late)DS task", HardMediumSoftScore.ONE_MEDIUM)
+    }
+
     private fun excludePrincipals(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
             .filter { task -> task.employee!!.team == Team.PRINCIPALS }
@@ -71,12 +85,13 @@ class HorseConstraintProvider : ConstraintProvider {
     private fun shareTasksFairly(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
             .groupBy(Task::employee, ConstraintCollectors.count())
-            .filter { employee, _ -> employee!!.workingShiftCount > 0 && employee.priorShifts > 0}
-            .penalize("Tasks shared unfairly between employees",
+            .filter { employee, _ -> employee!!.workingShiftCount > 0 && employee.priorShifts > 0 }
+            .penalize(
+                "Tasks shared unfairly between employees",
                 HardMediumSoftScore.ONE_SOFT
             ) { employee, taskCount ->
                 val penalty = 50 * taskCount / employee!!.workingShiftCount
-                    + 20 * employee.priorTasks / employee.priorShifts
+                +20 * employee.priorTasks / employee.priorShifts
                 penalty * penalty
             }
     }
