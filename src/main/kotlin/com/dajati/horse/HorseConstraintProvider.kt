@@ -71,7 +71,7 @@ class HorseConstraintProvider : ConstraintProvider {
     private fun shareTasksFairly(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
             .groupBy(Task::employee, ConstraintCollectors.count())
-            .filter { employee, _ -> employee!!.workingShiftCount > 0 }
+            .filter { employee, _ -> employee!!.workingShiftCount > 0 && employee.priorShifts > 0}
             .penalize("Tasks shared unfairly between employees",
                 HardMediumSoftScore.ONE_SOFT
             ) { employee, taskCount ->
@@ -80,5 +80,4 @@ class HorseConstraintProvider : ConstraintProvider {
                 penalty * penalty
             }
     }
-
 }
