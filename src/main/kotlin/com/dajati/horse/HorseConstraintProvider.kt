@@ -79,7 +79,7 @@ class HorseConstraintProvider : ConstraintProvider {
     private fun excludePrincipals(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
             .filter { task -> task.employee!!.team == Team.PRINCIPALS }
-            .penalize("Use of principals", HardMediumSoftScore.ONE_SOFT) { 100 }
+            .penalize("Use of principals", HardMediumSoftScore.ONE_SOFT) { 200 }
     }
 
     private fun shareTasksFairly(constraintFactory: ConstraintFactory): Constraint {
