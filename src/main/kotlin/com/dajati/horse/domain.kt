@@ -43,7 +43,7 @@ data class Employee(
     val name: String,
     val team: Team,
     val statuses: Array<Status>,
-    val availability: Availability,
+    val preferences: Preferences,
     val priorShifts: Int,
     val priorTasks: Int,
 ) {
@@ -66,11 +66,11 @@ data class Employee(
     fun canPerform(task: Task): Boolean {
         val shift = task.shift!!
         val duty = task.duty!!
-        return statuses[shift.ordinal] == Status.AVAILABLE && availability[shift, duty]
+        return statuses[shift.ordinal] == Status.AVAILABLE && preferences[shift, duty]
     }
 }
 
-data class Availability(val entries: List<List<Boolean>>) {
+data class Preferences(val entries: List<List<Boolean>>) {
     operator fun get(shift: Shift, duty: Duty): Boolean {
         return entries[shift.ordinal][duty.ordinal]
     }
