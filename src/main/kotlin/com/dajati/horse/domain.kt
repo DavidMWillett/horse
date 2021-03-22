@@ -44,8 +44,8 @@ data class Employee(
     val team: Team,
     val statuses: Array<Status>,
     val preferences: Preferences,
-    val priorShifts: Int,
-    val priorTasks: Int,
+    val priorShiftCount: Int,
+    val priorTaskCount: Int,
 ) {
     val workingShiftCount = statuses.count {
         it == Status.AVAILABLE || it == Status.UNAVAILABLE  || it == Status.WORKING_FROM_HOME
