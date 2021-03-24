@@ -8,6 +8,7 @@ class HorseConstraintProvider : ConstraintProvider {
         return arrayOf(
             simultaneousTasks(constraintFactory),
             employeeNotAvailable(constraintFactory),
+            assignAllTasks(constraintFactory),
             maxOneTaskPerDay(constraintFactory),
             fullDayFISH(constraintFactory),
             maxThreeTasksPerWeek(constraintFactory),
@@ -30,8 +31,14 @@ class HorseConstraintProvider : ConstraintProvider {
 
     private fun employeeNotAvailable(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
-            .filter { task -> !task.employee!!.canPerform(task) }
+            .filter { task -> task.employee != null && !task.employee.canPerform(task) }
             .penalize("Employee not available for shift/duty", HardMediumSoftScore.ONE_HARD)
+    }
+
+    private fun assignAllTasks(constraintFactory: ConstraintFactory): Constraint {
+        return constraintFactory.from(Task::class.java)
+            .filter { task -> task.employee == null }
+            .penalize("Unassigned task", HardMediumSoftScore.ONE_MEDIUM)
     }
 
     private fun maxOneTaskPerDay(constraintFactory: ConstraintFactory): Constraint {
@@ -58,6 +65,7 @@ class HorseConstraintProvider : ConstraintProvider {
 
     private fun maxThreeTasksPerWeek(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
+            .filter { task -> task.employee !== null }
             .groupBy(Task::employee, ConstraintCollectors.count())
             .filter { _, count -> count > 3 }
             .penalize("Employee with more than three tasks", HardMediumSoftScore.ONE_MEDIUM)
@@ -78,12 +86,13 @@ class HorseConstraintProvider : ConstraintProvider {
 
     private fun excludePrincipals(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
-            .filter { task -> task.employee!!.team == Team.PRINCIPALS }
+            .filter { task -> task.employee != null && task.employee.team == Team.PRINCIPALS }
             .penalize("Use of principals", HardMediumSoftScore.ONE_SOFT) { 200 }
     }
 
     private fun shareTasksFairly(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
+            .filter { task -> task.employee !== null }
             .groupBy(Task::employee, ConstraintCollectors.count())
             .filter { employee, _ -> employee!!.workingShiftCount > 0 && employee.priorShiftCount > 0 }
             .penalize(

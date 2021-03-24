@@ -24,7 +24,7 @@ class Roster(
 class Task(
     val duty: Duty? = null,
     val shift: Shift? = null,
-    @PlanningVariable(valueRangeProviderRefs = ["employeeRange"])
+    @PlanningVariable(valueRangeProviderRefs = ["employeeRange"], nullable = true)
     val employee: Employee? = null,
 ) {
     val id = nextId++
