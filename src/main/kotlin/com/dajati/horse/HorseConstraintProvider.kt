@@ -20,6 +20,7 @@ class HorseConstraintProvider : ConstraintProvider {
 
     private fun simultaneousTasks(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
+            .filter { task -> task.employee != null }
             .join(
                 Task::class.java,
                 Joiners.equal(Task::shift),
