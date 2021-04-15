@@ -45,11 +45,12 @@ data class Employee(
     val statuses: Array<Status>,
     val preferences: Preferences,
     val priorShiftCount: Int,
-    val priorTaskCount: Int,
+    val priorTaskCounts: Array<Int>,
 ) {
     val workingShiftCount = statuses.count {
         it == Status.AVAILABLE || it == Status.UNAVAILABLE  || it == Status.WORKING_FROM_HOME
     }
+    val priorTaskCount = priorTaskCounts.sum()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
