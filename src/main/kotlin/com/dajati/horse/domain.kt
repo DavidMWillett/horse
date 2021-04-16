@@ -44,13 +44,13 @@ data class Employee(
     val team: Team,
     val statuses: Array<Status>,
     val preferences: Preferences,
-    val priorShiftCount: Int,
-    val priorTaskCounts: TaskCounts,
+    val statistics: Statistics,
 ) {
     val workingShiftCount = statuses.count {
         it == Status.AVAILABLE || it == Status.UNAVAILABLE  || it == Status.WORKING_FROM_HOME
     }
-    val priorTaskCount = priorTaskCounts.sum()
+    val priorShiftCount = statistics.shiftCount
+    val priorTaskCount = statistics.taskCounts.sum()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -77,23 +77,25 @@ data class Preferences(val entries: List<List<Boolean>>) {
     }
 }
 
-data class TaskCounts(val counts: Array<Int>) {
-    fun sum() = counts.sum()
-
+data class Statistics(val shiftCount: Int, val taskCounts: Array<Int>) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as TaskCounts
+        other as Statistics
 
-        if (!counts.contentEquals(other.counts)) return false
+        if (shiftCount != other.shiftCount) return false
+        if (!taskCounts.contentEquals(other.taskCounts)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return counts.contentHashCode()
+        var result = shiftCount
+        result = 31 * result + taskCounts.contentHashCode()
+        return result
     }
+
 }
 
 enum class Team {
