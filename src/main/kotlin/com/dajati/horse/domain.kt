@@ -45,7 +45,7 @@ data class Employee(
     val statuses: Array<Status>,
     val preferences: Preferences,
     val priorShiftCount: Int,
-    val priorTaskCounts: Array<Int>,
+    val priorTaskCounts: TaskCounts,
 ) {
     val workingShiftCount = statuses.count {
         it == Status.AVAILABLE || it == Status.UNAVAILABLE  || it == Status.WORKING_FROM_HOME
@@ -74,6 +74,25 @@ data class Employee(
 data class Preferences(val entries: List<List<Boolean>>) {
     operator fun get(shift: Shift, duty: Duty): Boolean {
         return entries[shift.ordinal][duty.ordinal]
+    }
+}
+
+data class TaskCounts(val counts: Array<Int>) {
+    fun sum() = counts.sum()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TaskCounts
+
+        if (!counts.contentEquals(other.counts)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return counts.contentHashCode()
     }
 }
 
