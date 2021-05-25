@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.dajati"
-version = "0.5.1"
+version = "0.6.0"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
