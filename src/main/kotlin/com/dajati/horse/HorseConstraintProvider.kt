@@ -79,7 +79,7 @@ class HorseConstraintProvider : ConstraintProvider {
                 Joiners.equal(Task::employee),
                 Joiners.filtering { t1, t2 ->
                     (t1.duty == Duty.DS || t1.duty == Duty.LATE_DS) &&
-                        (t2.duty == Duty.DS || t2.duty == Duty.LATE_DS)
+                            (t2.duty == Duty.DS || t2.duty == Duty.LATE_DS)
                 }
             )
             .penalize("Employee with more than one (Late)DS task", HardMediumSoftScore.ONE_MEDIUM)
@@ -88,7 +88,7 @@ class HorseConstraintProvider : ConstraintProvider {
     private fun excludePrincipals(constraintFactory: ConstraintFactory): Constraint {
         return constraintFactory.from(Task::class.java)
             .filter { task -> task.employee != null && task.employee.team == Team.PRINCIPALS }
-            .penalize("Use of principals", HardMediumSoftScore.ONE_SOFT) { 200 }
+            .penalize("Use of principals", HardMediumSoftScore.ONE_MEDIUM)
     }
 
     private fun shareTasksFairly(constraintFactory: ConstraintFactory): Constraint {
@@ -100,8 +100,9 @@ class HorseConstraintProvider : ConstraintProvider {
                 "Tasks shared unfairly between employees",
                 HardMediumSoftScore.ONE_SOFT
             ) { employee, taskCount ->
-                val penalty = 50 * taskCount / employee!!.workingShiftCount
-                + 20 * employee.priorTaskCount / employee.priorShiftCount
+                // We need both an additive and a multiplicative component to determine penalty correctly
+                val penalty = ((50 + 100 * employee!!.priorTaskCount / employee.priorShiftCount)
+                        * taskCount / employee.workingShiftCount)
                 penalty * penalty
             }
     }
